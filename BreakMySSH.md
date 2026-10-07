@@ -100,7 +100,7 @@ hydra -l root -P /usr/share/wordlists/rockyou.txt -t 4 ssh://172.17.0.2
 
 Credenciales encontradas: **`root` : `estrella`**.
 
-*(Captura: salida de Hydra con la contraseña encontrada.)*
+
 
 ---
 
@@ -125,7 +125,8 @@ El prompt cambia a `root@<id>:~#`. El símbolo `#` confirma privilegios de **sup
 
 🩸 **Acceso como `root` conseguido.**
 
-![alt text](image.png)
+<img width="256" height="58" alt="Captura de pantalla 2026-10-07 185104" src="https://github.com/user-attachments/assets/cfb01c4e-55b6-46a3-add1-785a4b614182" />
+
 
 ---
 
