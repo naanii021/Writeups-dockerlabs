@@ -136,7 +136,13 @@ Revisión del directorio de root:
 ls -la /root
 ```
 
-No existe archivo de flag: en esta máquina el objetivo era directamente la obtención de `root`, ya cumplido.
+ls -la /root
+total 20
+drwx------ 1 root root 4096 May  5  2024 .
+drwxr-xr-x 1 root root 4096 Oct  7 15:52 ..
+-rw-r--r-- 1 root root 3106 Dec  5  2019 .bashrc
+-rw-r--r-- 1 root root  161 Dec  5  2019 .profile
+drwxr-xr-x 1 root root 4096 May  5  2024 vsftpd-2.3.4
 
 ---
 
@@ -148,7 +154,7 @@ Para eliminar el contenedor al terminar, se pulsa `Ctrl+C` en la terminal donde 
 
 ## ✅ Conclusión
 
-FirstHacking es una máquina introductoria ideal para asimilar el **ciclo básico de un pentest**:
+FirstHacking es una máquina introductoria para asimilar el **ciclo básico de un pentest**:
 
 1. **Reconocimiento** → `nmap` localiza el servicio y su versión.
 2. **Investigación** → `searchsploit` revela la vulnerabilidad asociada.
