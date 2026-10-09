@@ -1,0 +1,53 @@
+---
+import { SITE } from '../../config/site';
+import ThemeToggle from './ThemeToggle.astro';
+
+const pathname = Astro.url.pathname;
+const links = [
+  { href: '/writeups', label: 'Writeups' },
+  { href: '/buscar', label: 'Buscar' },
+  { href: '/sobre-mi', label: 'Sobre mí' },
+];
+---
+
+<header class="sticky top-0 z-40 border-b border-[var(--border)] bg-[color-mix(in_srgb,var(--bg)_88%,transparent)] backdrop-blur-xl">
+  <div class="container-page grid min-h-16 grid-cols-[1fr_auto] items-center gap-x-4 sm:grid-cols-[auto_1fr_auto]">
+    <div class="flex items-center gap-4">
+      <a href="/" class="font-mono text-sm font-bold no-underline" aria-label="Ir al inicio">
+        <span class="text-[var(--accent)]">dani@cybersec</span><span class="text-[var(--muted)]">:~$</span>
+        <span class="sr-only">{SITE.name}</span>
+      </a>
+      <span class="hidden items-center gap-2 font-mono text-[0.58rem] tracking-wider text-[var(--muted)] lg:inline-flex">
+        <i class="status-pulse size-1.5 rounded-full bg-[var(--accent)]"></i>
+        LAB ONLINE
+      </span>
+    </div>
+
+    <nav class="col-span-2 row-start-2 -mx-1 overflow-x-auto pb-2 sm:col-span-1 sm:row-start-1 sm:mx-0 sm:justify-self-end sm:pb-0" aria-label="Navegación principal">
+      <ul class="flex list-none items-center justify-center gap-1 p-0 text-sm sm:justify-end">
+        {links.map((link) => {
+          const active = link.href === '/writeups'
+            ? pathname.startsWith('/writeups')
+            : pathname === link.href;
+          return (
+            <li>
+              <a
+                href={link.href}
+                aria-current={active ? 'page' : undefined}
+                class:list={[
+                  'whitespace-nowrap rounded-md px-2 py-2 no-underline transition-colors sm:px-3',
+                  active ? 'bg-[var(--surface-strong)] text-[var(--accent)]' : 'text-[var(--muted)]',
+                ]}
+              >
+                {link.label}
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
+    <div class="justify-self-end sm:ml-2">
+      <ThemeToggle />
+    </div>
+  </div>
+</header>

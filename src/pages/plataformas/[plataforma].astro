@@ -1,0 +1,39 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import WriteupCard from '../../components/writeups/WriteupCard.astro';
+import { PLATFORM_LABELS } from '../../config/site';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getPublishedWriteups } from '../../utils/content';
+
+export async function getStaticPaths() {
+  const writeups = await getPublishedWriteups();
+  const platforms = [...new Set(writeups.map(({ data }) => data.plataforma))];
+
+  return platforms.map((platform) => ({
+    params: { plataforma: platform },
+    props: {
+      platform,
+      writeups: writeups.filter(({ data }) => data.plataforma === platform),
+    },
+  }));
+}
+
+interface Props {
+  platform: keyof typeof PLATFORM_LABELS;
+  writeups: CollectionEntry<'writeups'>[];
+}
+
+const { platform, writeups } = Astro.props;
+const label = PLATFORM_LABELS[platform];
+---
+
+<BaseLayout title={label} description={`Writeups y máquinas resueltas en ${label}.`}>
+  <header class="container-page pb-10 pt-14 sm:pt-20">
+    <p class="eyebrow">Plataforma</p>
+    <h1 class="mt-3 font-mono text-4xl font-bold sm:text-5xl">{label}</h1>
+    <p class="mt-4 text-[var(--muted)]">{writeups.length} máquina{writeups.length === 1 ? '' : 's'} documentada{writeups.length === 1 ? '' : 's'}</p>
+  </header>
+  <section class="container-page grid gap-5 pb-20 md:grid-cols-2 lg:grid-cols-3">
+    {writeups.map((writeup) => <WriteupCard writeup={writeup} />)}
+  </section>
+</BaseLayout>

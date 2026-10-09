@@ -1,0 +1,38 @@
+---
+interface Props {
+  tipo?: 'user' | 'root' | 'lab';
+}
+
+const { tipo = 'lab' } = Astro.props;
+---
+
+<details class="flag">
+  <summary>🚩 Mostrar flag ({tipo})</summary>
+  <div class="flag__value"><slot /></div>
+</details>
+
+<style>
+  .flag {
+    margin-block: 1.5rem;
+    border: 1px dashed var(--accent);
+    border-radius: 0.75rem;
+    background: color-mix(in srgb, var(--accent) 6%, var(--surface));
+    padding: 0.85rem 1rem;
+  }
+
+  summary {
+    color: var(--accent-strong);
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-weight: 700;
+  }
+
+  .flag__value {
+    margin-top: 0.8rem;
+    border-top: 1px solid var(--border);
+    padding-top: 0.8rem;
+    font-family: var(--font-mono);
+  }
+
+  .flag__value :global(p) { margin: 0; }
+</style>

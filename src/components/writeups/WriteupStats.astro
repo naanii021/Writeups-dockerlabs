@@ -1,0 +1,86 @@
+---
+import { DIFFICULTY_LABELS, PLATFORM_LABELS } from '../../config/site';
+import type { Writeup } from '../../utils/content';
+
+interface Props {
+  writeups: Writeup[];
+}
+
+const { writeups } = Astro.props;
+const byPlatform = Object.entries(
+  writeups.reduce<Record<string, number>>((counts, { data }) => {
+    counts[data.plataforma] = (counts[data.plataforma] ?? 0) + 1;
+    return counts;
+  }, {}),
+);
+const byDifficulty = Object.entries(
+  writeups.reduce<Record<string, number>>((counts, { data }) => {
+    counts[data.dificultad] = (counts[data.dificultad] ?? 0) + 1;
+    return counts;
+  }, {}),
+);
+const maxPlatform = Math.max(...byPlatform.map(([, count]) => count), 1);
+const maxDifficulty = Math.max(...byDifficulty.map(([, count]) => count), 1);
+---
+
+<section aria-labelledby="stats-title" class="card overflow-hidden">
+  <div class="flex items-center justify-between border-b border-[var(--border)] bg-[var(--surface-strong)] px-5 py-2.5 font-mono text-[0.62rem] tracking-widest text-[var(--muted)] sm:px-6">
+    <span>LAB_METRICS.LOG</span>
+    <span class="flex items-center gap-2"><i class="status-pulse size-1.5 rounded-full bg-[var(--accent)]"></i> LIVE DATA</span>
+  </div>
+  <div class="p-5 sm:p-6">
+  <div class="mb-5 flex items-center justify-between">
+    <h2 id="stats-title" class="font-mono text-lg font-bold">Estado del laboratorio</h2>
+    <div class="text-right">
+      <span class="block font-mono text-3xl font-bold text-[var(--accent)]">{String(writeups.length).padStart(2, '0')}</span>
+      <small class="font-mono text-[0.55rem] tracking-widest text-[var(--muted)]">MACHINES_PWNED</small>
+    </div>
+  </div>
+  <div class="grid gap-6 sm:grid-cols-2">
+    <div>
+      <p class="eyebrow mb-3">Por plataforma</p>
+      <ul class="space-y-2 p-0 text-sm">
+        {byPlatform.map(([platform, count]) => (
+          <li>
+            <div class="flex justify-between gap-4">
+              <span>{PLATFORM_LABELS[platform as keyof typeof PLATFORM_LABELS]}</span>
+              <strong class="font-mono text-[var(--accent)]">{String(count).padStart(2, '0')}</strong>
+            </div>
+            <div class="metric-track"><i style={`width: ${(count / maxPlatform) * 100}%`}></i></div>
+          </li>
+        ))}
+      </ul>
+    </div>
+    <div>
+      <p class="eyebrow mb-3">Por dificultad</p>
+      <ul class="space-y-2 p-0 text-sm">
+        {byDifficulty.map(([difficulty, count]) => (
+          <li>
+            <div class="flex justify-between gap-4">
+              <span>{DIFFICULTY_LABELS[difficulty as keyof typeof DIFFICULTY_LABELS]}</span>
+              <strong class="font-mono text-[var(--accent)]">{String(count).padStart(2, '0')}</strong>
+            </div>
+            <div class="metric-track"><i style={`width: ${(count / maxDifficulty) * 100}%`}></i></div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+  </div>
+</section>
+
+<style>
+  .metric-track {
+    overflow: hidden;
+    height: 2px;
+    margin-top: 0.35rem;
+    background: var(--border);
+  }
+
+  .metric-track i {
+    display: block;
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--cyan));
+    box-shadow: 0 0 7px color-mix(in srgb, var(--accent) 50%, transparent);
+  }
+</style>

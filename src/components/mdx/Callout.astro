@@ -1,0 +1,58 @@
+---
+interface Props {
+  tipo?: 'info' | 'warning' | 'tip';
+  titulo?: string;
+}
+
+const { tipo = 'info', titulo } = Astro.props;
+const labels = { info: 'Información', warning: 'Atención', tip: 'Consejo' };
+const icons = { info: 'i', warning: '!', tip: '+' };
+---
+
+<aside class:list={['callout', `callout--${tipo}`]} role={tipo === 'warning' ? 'alert' : 'note'}>
+  <span class="callout__icon" aria-hidden="true">{icons[tipo]}</span>
+  <div>
+    <strong>{titulo ?? labels[tipo]}</strong>
+    <div class="callout__content"><slot /></div>
+  </div>
+</aside>
+
+<style>
+  .callout {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.8rem;
+    margin-block: 1.5rem;
+    border: 1px solid var(--border);
+    border-left-width: 4px;
+    border-radius: 0.75rem;
+    background: var(--surface);
+    padding: 1rem;
+  }
+
+  .callout--info { border-left-color: #58a6ff; }
+  .callout--warning { border-left-color: #e3b341; }
+  .callout--tip { border-left-color: var(--accent); }
+
+  .callout__icon {
+    display: grid;
+    width: 1.55rem;
+    height: 1.55rem;
+    place-items: center;
+    border: 1px solid currentColor;
+    border-radius: 50%;
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 800;
+  }
+
+  strong {
+    color: var(--text);
+    font-family: var(--font-mono);
+  }
+
+  .callout__content :global(p) {
+    margin: 0.35rem 0 0;
+  }
+</style>

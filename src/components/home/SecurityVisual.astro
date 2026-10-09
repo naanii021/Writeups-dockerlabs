@@ -1,0 +1,191 @@
+<div class="security-console" aria-label="Monitor visual del laboratorio de ciberseguridad">
+  <div class="console-bar">
+    <div class="console-title">
+      <span class="status-dot"></span>
+      <span>LAB_MONITOR</span>
+    </div>
+    <span>NODE_021 // ONLINE</span>
+  </div>
+
+  <div class="radar-zone">
+    <svg class="radar" viewBox="0 0 420 280" role="img" aria-label="Diagrama de red del laboratorio">
+      <defs>
+        <radialGradient id="radarGlow">
+          <stop offset="0" stop-color="var(--accent)" stop-opacity=".2" />
+          <stop offset="1" stop-color="var(--accent)" stop-opacity="0" />
+        </radialGradient>
+      </defs>
+      <circle cx="210" cy="140" r="112" fill="url(#radarGlow)" />
+      <g class="rings" fill="none" stroke="currentColor">
+        <circle cx="210" cy="140" r="38" />
+        <circle cx="210" cy="140" r="76" />
+        <circle cx="210" cy="140" r="112" />
+        <path d="M98 140h224M210 28v224M131 61l158 158M289 61 131 219" />
+      </g>
+      <g class="connections" fill="none" stroke="currentColor">
+        <path d="m210 140-69-46m69 46 82-28m-82 28 54 70m-54-70-83 64" />
+      </g>
+      <g class="nodes">
+        <circle cx="210" cy="140" r="7" class="node node-main" />
+        <circle cx="141" cy="94" r="5" class="node" />
+        <circle cx="292" cy="112" r="5" class="node node-alert" />
+        <circle cx="264" cy="210" r="5" class="node" />
+        <circle cx="127" cy="204" r="5" class="node" />
+      </g>
+      <g class="labels" fill="currentColor">
+        <text x="222" y="135">LOCALHOST</text>
+        <text x="103" y="84">TARGET_01</text>
+        <text x="300" y="105">FTP:21</text>
+        <text x="272" y="228">ROOT</text>
+      </g>
+    </svg>
+    <div class="sweep" aria-hidden="true"></div>
+    <div class="target-card">
+      <span>ACTIVE TARGET</span>
+      <strong>FIRSTHACKING</strong>
+      <small>172.17.0.2</small>
+    </div>
+  </div>
+
+  <div class="telemetry">
+    <div><span>PUERTOS</span><strong>02</strong></div>
+    <div><span>VECTOR</span><strong>FTP</strong></div>
+    <div><span>ACCESO</span><strong class="success">ROOT</strong></div>
+  </div>
+
+  <div class="console-log" aria-hidden="true">
+    <span>12:42:08</span>
+    <p><b>root@lab:~#</b> writeup --publish firsthacking</p>
+    <i></i>
+  </div>
+</div>
+
+<style>
+  .security-console {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    background: color-mix(in srgb, #070c0b 96%, var(--accent));
+    box-shadow: var(--shadow), 0 0 0 1px rgb(61 220 151 / 0.04) inset;
+    color: #91a59b;
+    font-family: var(--font-mono);
+  }
+
+  .security-console::after {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(transparent 50%, rgb(0 0 0 / 0.11) 50%);
+    background-size: 100% 4px;
+    content: '';
+    pointer-events: none;
+  }
+
+  .console-bar,
+  .console-title,
+  .telemetry,
+  .console-log {
+    display: flex;
+    align-items: center;
+  }
+
+  .console-bar {
+    justify-content: space-between;
+    border-bottom: 1px solid #263a34;
+    background: #101a17;
+    padding: 0.65rem 0.9rem;
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
+  }
+
+  .console-title { gap: 0.5rem; color: #dce8e1; }
+
+  .status-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: #3ddc97;
+    box-shadow: 0 0 0 0 rgb(61 220 151 / 0.5);
+    animation: status-pulse 2s infinite;
+  }
+
+  .radar-zone {
+    position: relative;
+    min-height: 18rem;
+    background-image:
+      linear-gradient(rgb(61 220 151 / 0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(61 220 151 / 0.035) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  .radar { width: 100%; height: 18rem; color: #3ddc97; }
+  .rings { opacity: 0.18; stroke-width: 1; }
+  .connections { opacity: 0.5; stroke-width: 1; stroke-dasharray: 4 5; }
+  .node { fill: #3ddc97; filter: drop-shadow(0 0 6px #3ddc97); }
+  .node-main { fill: #f0fff8; }
+  .node-alert { fill: #ff7b72; filter: drop-shadow(0 0 7px #ff7b72); }
+  .labels { font-size: 8px; letter-spacing: 0.08em; }
+
+  .sweep {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 7rem;
+    height: 1px;
+    transform-origin: left;
+    background: linear-gradient(90deg, #3ddc97, transparent);
+    animation: radar-sweep 6s linear infinite;
+  }
+
+  .target-card {
+    position: absolute;
+    right: 0.9rem;
+    bottom: 0.9rem;
+    display: grid;
+    border-left: 2px solid #ff7b72;
+    background: rgb(7 12 11 / 0.84);
+    padding: 0.5rem 0.7rem;
+    backdrop-filter: blur(5px);
+  }
+
+  .target-card span { color: #ff7b72; font-size: 0.55rem; letter-spacing: 0.12em; }
+  .target-card strong { color: #e6eee9; font-size: 0.75rem; }
+  .target-card small { font-size: 0.62rem; }
+
+  .telemetry {
+    border-block: 1px solid #263a34;
+    background: #0b1210;
+  }
+
+  .telemetry div {
+    display: grid;
+    flex: 1;
+    gap: 0.1rem;
+    border-right: 1px solid #263a34;
+    padding: 0.65rem 0.8rem;
+  }
+
+  .telemetry div:last-child { border-right: 0; }
+  .telemetry span { font-size: 0.55rem; letter-spacing: 0.12em; }
+  .telemetry strong { color: #e6eee9; font-size: 0.82rem; }
+  .telemetry .success { color: #7ef0bd; }
+
+  .console-log {
+    gap: 0.6rem;
+    padding: 0.7rem 0.9rem;
+    font-size: 0.62rem;
+  }
+
+  .console-log p { margin: 0; color: #c4d2ca; }
+  .console-log b { color: #7ef0bd; font-weight: 500; }
+  .console-log i {
+    width: 0.4rem;
+    height: 0.8rem;
+    background: #3ddc97;
+    animation: blink 1s step-end infinite;
+  }
+
+  @keyframes radar-sweep { to { transform: rotate(360deg); } }
+  @keyframes blink { 50% { opacity: 0; } }
+  @keyframes status-pulse { 70% { box-shadow: 0 0 0 7px rgb(61 220 151 / 0); } }
+</style>

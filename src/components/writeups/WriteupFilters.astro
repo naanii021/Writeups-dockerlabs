@@ -1,0 +1,102 @@
+---
+import { dificultades, plataformas, sistemasOperativos } from '../../content.config';
+import { DIFFICULTY_LABELS, OS_LABELS, PLATFORM_LABELS } from '../../config/site';
+
+interface Props {
+  tecnicas: string[];
+}
+
+const { tecnicas } = Astro.props;
+---
+
+<form class="card mb-8 p-4 sm:p-5" data-writeup-filters>
+  <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <label class="grid gap-1.5 text-sm">
+      <span class="font-mono text-xs text-[var(--muted)]">Plataforma</span>
+      <select name="plataforma">
+        <option value="">Todas</option>
+        {plataformas.map((value) => <option value={value}>{PLATFORM_LABELS[value]}</option>)}
+      </select>
+    </label>
+    <label class="grid gap-1.5 text-sm">
+      <span class="font-mono text-xs text-[var(--muted)]">Dificultad</span>
+      <select name="dificultad">
+        <option value="">Todas</option>
+        {dificultades.map((value) => <option value={value}>{DIFFICULTY_LABELS[value]}</option>)}
+      </select>
+    </label>
+    <label class="grid gap-1.5 text-sm">
+      <span class="font-mono text-xs text-[var(--muted)]">Sistema operativo</span>
+      <select name="so">
+        <option value="">Todos</option>
+        {sistemasOperativos.map((value) => <option value={value}>{OS_LABELS[value]}</option>)}
+      </select>
+    </label>
+    <label class="grid gap-1.5 text-sm">
+      <span class="font-mono text-xs text-[var(--muted)]">Técnica</span>
+      <select name="tecnica">
+        <option value="">Todas</option>
+        {tecnicas.map((value) => <option value={value}>{value}</option>)}
+      </select>
+    </label>
+  </div>
+  <div class="mt-4 flex items-center justify-between gap-4">
+    <p class="text-sm text-[var(--muted)]" aria-live="polite" data-filter-count></p>
+    <button type="reset" class="cursor-pointer border-0 bg-transparent font-mono text-xs text-[var(--accent)] underline underline-offset-4">
+      Limpiar filtros
+    </button>
+  </div>
+</form>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('[data-writeup-filters]');
+  const cards = [...document.querySelectorAll<HTMLElement>('[data-writeup-card]')];
+  const counter = form?.querySelector<HTMLElement>('[data-filter-count]');
+
+  function applyFilters() {
+    if (!form) return;
+    const values = Object.fromEntries(new FormData(form)) as Record<string, string>;
+    let visible = 0;
+
+    cards.forEach((card) => {
+      const techniques = card.dataset.techniques?.split(',') ?? [];
+      const matches =
+        (!values.plataforma || card.dataset.platform === values.plataforma) &&
+        (!values.dificultad || card.dataset.difficulty === values.dificultad) &&
+        (!values.so || card.dataset.os === values.so) &&
+        (!values.tecnica || techniques.includes(values.tecnica));
+      card.hidden = !matches;
+      if (matches) visible += 1;
+    });
+
+    if (counter) counter.textContent = `${visible} writeup${visible === 1 ? '' : 's'}`;
+
+    const params = new URLSearchParams();
+    Object.entries(values).forEach(([key, value]) => value && params.set(key, value));
+    const query = params.toString();
+    history.replaceState({}, '', `${location.pathname}${query ? `?${query}` : ''}`);
+  }
+
+  if (form) {
+    const params = new URLSearchParams(location.search);
+    [...form.elements].forEach((element) => {
+      if (element instanceof HTMLSelectElement) {
+        element.value = params.get(element.name) ?? '';
+      }
+    });
+    form.addEventListener('change', applyFilters);
+    form.addEventListener('reset', () => window.setTimeout(applyFilters));
+    applyFilters();
+  }
+</script>
+
+<style>
+  select {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    background: var(--surface-strong);
+    color: var(--text);
+    padding: 0.58rem 0.7rem;
+  }
+</style>

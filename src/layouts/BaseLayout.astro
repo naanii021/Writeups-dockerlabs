@@ -1,0 +1,79 @@
+---
+import '@fontsource-variable/jetbrains-mono';
+import '../styles/global.css';
+import Footer from '../components/layout/Footer.astro';
+import Header from '../components/layout/Header.astro';
+import SEO from '../components/seo/SEO.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  type?: 'website' | 'article';
+  publishedTime?: Date;
+}
+
+const props = Astro.props;
+---
+
+<!doctype html>
+<html lang="es" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="theme-color" content="#080d0c" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="alternate" type="application/rss+xml" title="Writeups de Dani" href="/rss.xml" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <SEO {...props} />
+    <script is:inline>
+      (() => {
+        const saved = localStorage.getItem('theme');
+        const theme = saved === 'light' ? 'light' : 'dark';
+        document.documentElement.dataset.theme = theme;
+        document.documentElement.style.colorScheme = theme;
+      })();
+    </script>
+  </head>
+  <body class="flex min-h-screen flex-col">
+    <a class="skip-link" href="#contenido">Saltar al contenido</a>
+    <Header />
+    <main id="contenido" class="flex-1" data-pagefind-body>
+      <slot />
+    </main>
+    <Footer />
+
+    <script>
+      const themeToggle = document.querySelector<HTMLButtonElement>('#theme-toggle');
+      themeToggle?.addEventListener('click', () => {
+        const current = document.documentElement.dataset.theme;
+        const next = current === 'light' ? 'dark' : 'light';
+        document.documentElement.dataset.theme = next;
+        document.documentElement.style.colorScheme = next;
+        localStorage.setItem('theme', next);
+      });
+
+      document.querySelectorAll<HTMLElement>('.prose-writeup .astro-code').forEach((block) => {
+        if (block.parentElement?.classList.contains('code-frame')) return;
+
+        const frame = document.createElement('div');
+        frame.className = 'code-frame';
+        block.parentNode?.insertBefore(frame, block);
+        frame.appendChild(block);
+
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'copy-code';
+        button.textContent = 'Copiar';
+        button.setAttribute('aria-label', 'Copiar bloque de código');
+        button.addEventListener('click', async () => {
+          await navigator.clipboard.writeText(block.textContent ?? '');
+          button.textContent = 'Copiado';
+          window.setTimeout(() => (button.textContent = 'Copiar'), 1600);
+        });
+        frame.appendChild(button);
+      });
+    </script>
+  </body>
+</html>

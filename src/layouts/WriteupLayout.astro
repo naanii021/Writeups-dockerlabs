@@ -1,0 +1,170 @@
+---
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import TableOfContents from '../components/writeups/TableOfContents.astro';
+import { DIFFICULTY_LABELS, OS_LABELS, PLATFORM_LABELS } from '../config/site';
+import { slugify } from '../utils/content';
+import BaseLayout from './BaseLayout.astro';
+
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+interface Props {
+  entry: CollectionEntry<'writeups'>;
+  headings: Heading[];
+  readingTime: number;
+}
+
+const { entry, headings, readingTime } = Astro.props;
+const { data } = entry;
+---
+
+<BaseLayout
+  title={data.titulo}
+  description={data.resumen}
+  image={data.imagenPortada?.src}
+  type="article"
+  publishedTime={data.fecha}
+>
+  <article>
+    <header class="writeup-hero border-b border-[var(--border)] py-12 sm:py-16">
+      <div class="container-page grid max-w-6xl items-end gap-10 lg:grid-cols-[minmax(0,1fr)_17rem]">
+        <div>
+          <a class="eyebrow no-underline" href={`/plataformas/${data.plataforma}`}>
+            {PLATFORM_LABELS[data.plataforma]}
+          </a>
+          <h1 class="mt-4 max-w-4xl font-mono text-4xl font-bold leading-[1.08] tracking-tight sm:text-6xl" data-pagefind-meta="title">
+            {data.titulo}
+          </h1>
+          <p class="mt-5 max-w-3xl text-lg text-[var(--muted)] sm:text-xl">{data.resumen}</p>
+          <div class="mt-7 flex flex-wrap items-center gap-2 text-sm">
+            <span class="badge">{DIFFICULTY_LABELS[data.dificultad]}</span>
+            <span class="badge">{OS_LABELS[data.sistemaOperativo]}</span>
+            <time class="badge" datetime={data.fecha.toISOString()}>
+              {data.fecha.toLocaleDateString('es-ES', { dateStyle: 'long' })}
+            </time>
+            <span class="badge">{readingTime} min de lectura</span>
+          </div>
+          {data.borrador && (
+            <p class="mt-5 inline-flex rounded-md border border-amber-400/40 bg-amber-400/10 px-3 py-1 font-mono text-sm text-amber-300">
+              Borrador: solo visible en desarrollo
+            </p>
+          )}
+        </div>
+
+        <aside class="target-panel" aria-label="Ficha técnica del objetivo">
+          <div class="target-panel__bar"><span></span> TARGET ACQUIRED</div>
+          <dl>
+            <div><dt>ID</dt><dd>{entry.id.toUpperCase()}</dd></div>
+            <div><dt>PLATFORM</dt><dd>{PLATFORM_LABELS[data.plataforma]}</dd></div>
+            <div><dt>HOST OS</dt><dd>{OS_LABELS[data.sistemaOperativo]}</dd></div>
+            <div><dt>VECTORS</dt><dd>{String(data.tecnicas.length).padStart(2, '0')}</dd></div>
+            <div><dt>STATUS</dt><dd class="status-ok">PWNED</dd></div>
+          </dl>
+        </aside>
+      </div>
+    </header>
+
+    {data.imagenPortada && (
+      <div class="container-page max-w-5xl pt-10">
+        <Image
+          src={data.imagenPortada}
+          alt={`Portada del writeup ${data.titulo}`}
+          widths={[720, 1080, 1440]}
+          sizes="(max-width: 1152px) 100vw, 1024px"
+          class="aspect-[16/8] w-full rounded-xl border border-[var(--border)] object-cover"
+        />
+      </div>
+    )}
+
+    <div class="container-page grid max-w-6xl gap-12 py-12 lg:grid-cols-[minmax(0,1fr)_15rem] lg:py-16">
+      <div class="prose-writeup min-w-0">
+        <slot />
+
+        <footer class="mt-14 border-t border-[var(--border)] pt-8">
+          <p class="eyebrow mb-3">Técnicas</p>
+          <div class="flex flex-wrap gap-2">
+            {data.tecnicas.map((tecnica) => (
+              <a class="badge no-underline hover:border-[var(--accent)]" href={`/tags/${slugify(tecnica)}`}>
+                #{slugify(tecnica)}
+              </a>
+            ))}
+          </div>
+          <p class="eyebrow mb-3 mt-7">Herramientas</p>
+          <div class="flex flex-wrap gap-2">
+            {data.herramientas.map((herramienta) => <span class="badge">{herramienta}</span>)}
+          </div>
+        </footer>
+      </div>
+
+      <aside class="order-first lg:order-none">
+        <div class="lg:sticky lg:top-24">
+          <TableOfContents headings={headings} />
+        </div>
+      </aside>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .writeup-hero {
+    position: relative;
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 78% 40%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 22rem),
+      linear-gradient(90deg, color-mix(in srgb, var(--surface) 85%, transparent), transparent);
+  }
+
+  .writeup-hero::after {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(color-mix(in srgb, var(--accent) 4%, transparent) 1px, transparent 1px),
+      linear-gradient(90deg, color-mix(in srgb, var(--accent) 4%, transparent) 1px, transparent 1px);
+    background-size: 30px 30px;
+    content: '';
+    mask-image: linear-gradient(90deg, transparent 45%, black);
+    pointer-events: none;
+  }
+
+  .writeup-hero > div { position: relative; z-index: 1; }
+
+  .target-panel {
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 0.7rem;
+    background: color-mix(in srgb, var(--surface) 90%, transparent);
+    box-shadow: var(--shadow);
+    font-family: var(--font-mono);
+  }
+
+  .target-panel__bar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface-strong);
+    padding: 0.55rem 0.75rem;
+    color: var(--muted);
+    font-size: 0.58rem;
+    letter-spacing: 0.1em;
+  }
+
+  .target-panel__bar span {
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 50%;
+    background: var(--danger);
+    box-shadow: 0 0 7px var(--danger);
+  }
+
+  dl { margin: 0; padding: 0.5rem 0.75rem; }
+  dl div { display: flex; justify-content: space-between; gap: 1rem; padding: 0.42rem 0; border-bottom: 1px dashed var(--border); }
+  dl div:last-child { border-bottom: 0; }
+  dt { color: var(--muted); font-size: 0.6rem; }
+  dd { margin: 0; color: var(--text); font-size: 0.64rem; text-align: right; }
+  dd.status-ok { color: var(--accent); }
+</style>

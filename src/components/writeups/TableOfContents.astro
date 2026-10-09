@@ -1,0 +1,48 @@
+---
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+interface Props {
+  headings: Heading[];
+}
+
+const headings = Astro.props.headings.filter(({ depth }) => depth === 2 || depth === 3);
+---
+
+{headings.length > 0 && (
+  <nav class="toc" aria-labelledby="toc-title">
+    <p id="toc-title">En esta máquina</p>
+    <ol>
+      {headings.map((heading) => (
+        <li class:list={{ nested: heading.depth === 3 }}>
+          <a href={`#${heading.slug}`}>{heading.text}</a>
+        </li>
+      ))}
+    </ol>
+  </nav>
+)}
+
+<style>
+  .toc {
+    border-left: 1px solid var(--border);
+    padding-left: 1rem;
+  }
+
+  p {
+    margin: 0 0 0.75rem;
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  ol { margin: 0; padding: 0; list-style: none; }
+  li + li { margin-top: 0.45rem; }
+  li.nested { padding-left: 0.8rem; font-size: 0.88rem; }
+  a { color: var(--muted); font-size: 0.92rem; text-decoration: none; }
+  a:hover { color: var(--accent); }
+</style>

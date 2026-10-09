@@ -1,11 +1,83 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
+import SecurityVisual from '../components/home/SecurityVisual.astro';
+import WriteupCard from '../components/writeups/WriteupCard.astro';
+import WriteupStats from '../components/writeups/WriteupStats.astro';
+import { SITE } from '../config/site';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getPublishedWriteups } from '../utils/content';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+const writeups = await getPublishedWriteups();
+const latest = writeups.slice(0, 3);
 ---
 
-<Layout>
-	<Welcome />
-</Layout>
+<BaseLayout>
+  <section class="container-page section-space grid items-center gap-12 lg:grid-cols-[1.1fr_0.9fr]">
+    <div>
+      <div class="mb-6 flex flex-wrap items-center gap-3 font-mono text-[0.68rem] tracking-wider text-[var(--muted)]">
+        <span class="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface)] px-3 py-1.5">
+          <i class="status-pulse size-1.5 rounded-full bg-[var(--accent)]"></i> SISTEMA ONLINE
+        </span>
+        <span>LOC: CÁCERES_ES</span>
+      </div>
+      <p class="eyebrow">Fullstack / Hacking ético</p>
+      <h1 class="mt-5 max-w-4xl font-mono text-4xl font-bold leading-[1.06] tracking-tight sm:text-6xl lg:text-7xl">
+        Aprendo rompiendo<br />
+        <span class="text-[var(--accent)]">máquinas.</span>
+      </h1>
+      <p class="mt-7 max-w-2xl text-lg text-[var(--muted)] sm:text-xl">
+        Soy Dani, desarrollador fullstack junior y estudiante de ciberseguridad. Documento aquí cada laboratorio, comando y aprendizaje para entenderlos de verdad.
+      </p>
+      <div class="mt-8 flex flex-wrap gap-3">
+        <a class="rounded-lg bg-[var(--accent)] px-5 py-3 font-mono text-sm font-bold text-[#04100b] no-underline hover:bg-[var(--accent-strong)] hover:text-[#04100b]" href="/writeups">
+          Explorar writeups →
+        </a>
+        <a class="rounded-lg border border-[var(--border)] px-5 py-3 font-mono text-sm no-underline hover:border-[var(--accent)]" href={SITE.github} target="_blank" rel="noreferrer">
+          GitHub ↗
+        </a>
+      </div>
+    </div>
+
+    <SecurityVisual />
+  </section>
+
+  <div class="border-y border-[var(--border)] bg-[color-mix(in_srgb,var(--surface)_78%,transparent)]">
+    <div class="container-page grid grid-cols-2 divide-x divide-[var(--border)] sm:grid-cols-4">
+      {['01_RECON', '02_ENUM', '03_EXPLOIT', '04_PRIVESC'].map((phase, index) => (
+        <div class="flex items-center gap-3 px-3 py-3 font-mono text-[0.65rem] text-[var(--muted)] sm:px-5">
+          <span class="text-[var(--accent)]">0{index + 1}</span>
+          <span>{phase.slice(3)}</span>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <section class="border-y border-[var(--border)] bg-[var(--surface)]">
+    <div class="container-page section-space">
+      <div class="mb-8 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <p class="eyebrow">Últimos writeups</p>
+          <h2 class="mt-2 font-mono text-3xl font-bold">Notas desde el laboratorio</h2>
+        </div>
+        <a href="/writeups" class="font-mono text-sm text-[var(--accent)]">Ver todos →</a>
+      </div>
+      {latest.length > 0 ? (
+        <div class="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+          {latest.map((writeup) => <WriteupCard writeup={writeup} />)}
+        </div>
+      ) : (
+        <p class="text-[var(--muted)]">El primer writeup está en preparación.</p>
+      )}
+    </div>
+  </section>
+
+  <section class="container-page section-space grid gap-8 lg:grid-cols-[0.8fr_1.2fr]">
+    <div>
+      <p class="eyebrow">Progreso verificable</p>
+      <h2 class="mt-3 font-mono text-3xl font-bold">Cada máquina deja una pista.</h2>
+      <p class="mt-4 max-w-xl text-[var(--muted)]">
+        Las estadísticas se calculan durante el build directamente desde la colección. Añadir un nuevo MDX actualiza el portfolio sin mantener contadores a mano.
+      </p>
+    </div>
+    <WriteupStats writeups={writeups} />
+  </section>
+</BaseLayout>

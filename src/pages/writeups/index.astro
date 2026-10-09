@@ -1,0 +1,29 @@
+---
+import WriteupCard from '../../components/writeups/WriteupCard.astro';
+import WriteupFilters from '../../components/writeups/WriteupFilters.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getPublishedWriteups, slugify } from '../../utils/content';
+
+const writeups = await getPublishedWriteups();
+const tecnicas = [...new Set(writeups.flatMap(({ data }) => data.tecnicas))]
+  .map(slugify)
+  .sort((a, b) => a.localeCompare(b, 'es'));
+---
+
+<BaseLayout title="Writeups" description="Resoluciones paso a paso de máquinas vulnerables y laboratorios de pentesting.">
+  <header class="container-page pb-10 pt-14 sm:pt-20">
+    <p class="eyebrow">Colección / writeups</p>
+    <h1 class="mt-3 font-mono text-4xl font-bold sm:text-6xl">Máquinas resueltas</h1>
+    <p class="mt-5 max-w-2xl text-lg text-[var(--muted)]">
+      Metodología, comandos y decisiones explicadas desde el reconocimiento hasta la escalada de privilegios.
+    </p>
+  </header>
+
+  <section class="container-page pb-20">
+    <WriteupFilters tecnicas={tecnicas} />
+    <div class="grid gap-5 md:grid-cols-2 lg:grid-cols-3" data-writeups-grid>
+      {writeups.map((writeup) => <WriteupCard writeup={writeup} />)}
+    </div>
+    {writeups.length === 0 && <p class="card p-8 text-center text-[var(--muted)]">Todavía no hay writeups publicados.</p>}
+  </section>
+</BaseLayout>

@@ -1,0 +1,87 @@
+---
+interface Props {
+  comando?: string;
+  titulo?: string;
+}
+
+const { comando, titulo = 'terminal' } = Astro.props;
+---
+
+<figure class="terminal">
+  <figcaption>
+    <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+    <span>{titulo}</span>
+    <button type="button" data-copy-terminal>Copiar</button>
+  </figcaption>
+  <div class="terminal__body">
+    {comando && <p class="command"><span aria-hidden="true">$ </span>{comando}</p>}
+    <div class="output"><slot /></div>
+  </div>
+</figure>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('[data-copy-terminal]').forEach((button) => {
+    if (button.dataset.ready) return;
+    button.dataset.ready = 'true';
+    button.addEventListener('click', async () => {
+      const terminal = button.closest('.terminal');
+      const body = terminal?.querySelector<HTMLElement>('.terminal__body');
+      await navigator.clipboard.writeText(body?.innerText ?? '');
+      button.textContent = 'Copiado';
+      window.setTimeout(() => (button.textContent = 'Copiar'), 1600);
+    });
+  });
+</script>
+
+<style>
+  .terminal {
+    overflow: hidden;
+    margin-block: 1.5rem;
+    border: 1px solid #263a34;
+    border-radius: 0.75rem;
+    background: #050908;
+    color: #dce8e1;
+  }
+
+  figcaption {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    border-bottom: 1px solid #263a34;
+    background: #101a17;
+    padding: 0.5rem 0.7rem;
+    color: #91a59b;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+  }
+
+  .dots { display: flex; gap: 0.3rem; }
+  .dots i { width: 0.55rem; height: 0.55rem; border-radius: 50%; background: #3b524b; }
+  .dots i:first-child { background: #ff7b72; }
+  .dots i:nth-child(2) { background: #e3b341; }
+  .dots i:last-child { background: #3ddc97; }
+
+  button {
+    justify-self: end;
+    border: 0;
+    background: transparent;
+    color: #91a59b;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: inherit;
+  }
+
+  button:hover { color: #7ef0bd; }
+
+  .terminal__body {
+    overflow-x: auto;
+    padding: 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.84rem;
+    line-height: 1.65;
+  }
+
+  .command { margin: 0; color: #7ef0bd; white-space: pre-wrap; }
+  .output { margin-top: 0.7rem; color: #aabbb2; }
+  .output :global(p) { margin: 0; white-space: pre-wrap; }
+</style>

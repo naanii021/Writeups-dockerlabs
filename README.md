@@ -1,46 +1,53 @@
-# Astro Starter Kit: Basics
+# Portfolio de ciberseguridad de Dani
 
-```sh
-npm create astro@latest -- --template basics
+Portfolio estático construido con Astro 7, TypeScript, MDX y Tailwind CSS 4. El núcleo es la colección `writeups`: Astro valida el frontmatter con Zod y genera una ruta HTML por máquina durante el build.
+
+## Desarrollo
+
+```bash
+npm install
+npx astro dev --background
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+El servidor en segundo plano se gestiona con:
 
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-│   └── favicon.svg
-├── src
-│   ├── assets
-│   │   └── astro.svg
-│   ├── components
-│   │   └── Welcome.astro
-│   ├── layouts
-│   │   └── Layout.astro
-│   └── pages
-│       └── index.astro
-└── package.json
+```bash
+npx astro dev status
+npx astro dev logs
+npx astro dev stop
 ```
 
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
+Comprobaciones disponibles:
 
-## 🧞 Commands
+```bash
+npm run check
+npm run build
+npm run preview
+```
 
-All commands are run from the root of the project, from a terminal:
+`npm run build` crea el sitio en `dist/` y después ejecuta Pagefind para generar el índice de búsqueda estática.
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+## Crear un writeup
 
-## 👀 Want to learn more?
+1. Copia `templates/writeup.mdx` dentro de `src/content/writeups/`.
+2. Ponle un nombre de archivo apto para URL, por ejemplo `cap-dockerlabs.mdx`.
+3. Completa el frontmatter y conserva las secciones de la plantilla.
+4. Usa `borrador: true` mientras trabajas. Los borradores se excluyen de producción.
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+El frontmatter admite:
+
+- `titulo`: nombre visible de la máquina.
+- `plataforma`: `dockerlabs`, `hackmyvm`, `tryhackme`, `hackthebox` o `portswigger`.
+- `dificultad`: `muy-facil`, `facil`, `media`, `dificil` o `insane`.
+- `sistemaOperativo`: `linux` o `windows`.
+- `fecha`: fecha compatible con YAML.
+- `tecnicas` y `herramientas`: listas de texto.
+- `imagenPortada`: imagen local opcional; Astro la optimiza mediante `astro:assets`.
+- `resumen`: entre 30 y 240 caracteres.
+- `borrador`: controla su publicación.
+
+Dentro de MDX están disponibles `<Callout>`, `<Terminal>` y `<Flag>`. MDX combina la escritura sencilla de Markdown con componentes reutilizables; no convierte el sitio en una aplicación React ni añade hidratación por sí mismo.
+
+## Despliegue en Netlify
+
+El repositorio incluye `netlify.toml`. Al importar el repositorio en Netlify se ejecutará `npm run build` y se publicará `dist/`. Define `SITE_URL` con el dominio definitivo para generar URLs canónicas, Open Graph, RSS, sitemap y robots correctamente.

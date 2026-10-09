@@ -1,0 +1,22 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Buscar" description="Busca comandos, herramientas y técnicas dentro de todos los writeups.">
+  <section class="container-page section-space max-w-4xl">
+    <p class="eyebrow">Pagefind / índice estático</p>
+    <h1 class="mt-3 font-mono text-4xl font-bold sm:text-5xl">Buscar en el laboratorio</h1>
+    <p class="mt-4 max-w-2xl text-[var(--muted)]">
+      Busca máquinas, técnicas, herramientas o comandos. El índice se genera después del build y funciona sin servidor.
+    </p>
+
+    <div class="card mt-9 p-4 sm:p-6" data-pagefind-ignore>
+      <link href="/pagefind/pagefind-component-ui.css" rel="stylesheet" />
+      <script src="/pagefind/pagefind-component-ui.js" type="module"></script>
+      <pagefind-searchbox></pagefind-searchbox>
+      <noscript>
+        <p class="text-[var(--muted)]">La búsqueda interactiva necesita JavaScript. Puedes navegar por plataformas y etiquetas desde los writeups.</p>
+      </noscript>
+    </div>
+  </section>
+</BaseLayout>

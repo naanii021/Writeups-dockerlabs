@@ -1,0 +1,150 @@
+---
+import { Image } from 'astro:assets';
+import { DIFFICULTY_LABELS, OS_LABELS, PLATFORM_LABELS } from '../../config/site';
+import { slugify, type Writeup } from '../../utils/content';
+
+interface Props {
+  writeup: Writeup;
+}
+
+const { writeup } = Astro.props;
+const { data } = writeup;
+const platformLabel = PLATFORM_LABELS[data.plataforma];
+---
+
+<article
+  class="card group flex h-full flex-col overflow-hidden transition duration-200 hover:-translate-y-1 hover:border-[var(--accent)]"
+  data-writeup-card
+  data-platform={data.plataforma}
+  data-difficulty={data.dificultad}
+  data-os={data.sistemaOperativo}
+  data-techniques={data.tecnicas.map(slugify).join(',')}
+>
+  {data.imagenPortada ? (
+    <a class="writeup-cover" href={`/writeups/${writeup.id}`} tabindex="-1" aria-hidden="true">
+      <Image
+        src={data.imagenPortada}
+        alt=""
+        widths={[480, 760]}
+        sizes="(max-width: 768px) 100vw, 33vw"
+        class="aspect-[16/9] w-full object-cover"
+      />
+    </a>
+  ) : (
+    <a class="writeup-cover writeup-cover--generated" href={`/writeups/${writeup.id}`} tabindex="-1" aria-hidden="true">
+      <div class="cover-coordinates">
+        <span>TARGET::{writeup.id.toUpperCase()}</span>
+        <span>{data.sistemaOperativo.toUpperCase()}_HOST</span>
+      </div>
+      <svg viewBox="0 0 360 120" aria-hidden="true">
+        <g class="cover-lines" fill="none">
+          <path d="M24 86 94 35l77 48 65-50 96 47" />
+          <path d="M94 35v54m77-6V25m65 8v62" />
+        </g>
+        <g class="cover-nodes">
+          <circle cx="24" cy="86" r="4" />
+          <circle cx="94" cy="35" r="5" />
+          <circle cx="171" cy="83" r="6" />
+          <circle cx="236" cy="33" r="5" />
+          <circle cx="332" cy="80" r="4" />
+        </g>
+      </svg>
+      <div class="cover-title">
+        <span>{platformLabel}</span>
+        <strong>&gt;_ {data.titulo}</strong>
+      </div>
+    </a>
+  )}
+  <div class="flex flex-1 flex-col p-5">
+    <div class="mb-4 flex flex-wrap gap-2">
+      <a class="badge no-underline" href={`/plataformas/${data.plataforma}`}>
+        {platformLabel}
+      </a>
+      <span class="badge">{DIFFICULTY_LABELS[data.dificultad]}</span>
+      <span class="badge">{OS_LABELS[data.sistemaOperativo]}</span>
+    </div>
+    <h3 class="font-mono text-xl font-bold leading-tight">
+      <a class="no-underline group-hover:text-[var(--accent)]" href={`/writeups/${writeup.id}`}>
+        {data.titulo}
+      </a>
+    </h3>
+    <p class="mt-3 flex-1 text-sm text-[var(--muted)]">{data.resumen}</p>
+    <div class="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-[var(--border)] pt-4 text-xs text-[var(--muted)]">
+      <time datetime={data.fecha.toISOString()}>
+        {data.fecha.toLocaleDateString('es-ES', { dateStyle: 'medium' })}
+      </time>
+      <div class="flex flex-wrap justify-end gap-2">
+        {data.tecnicas.slice(0, 2).map((tecnica) => (
+          <a class="font-mono hover:text-[var(--accent)]" href={`/tags/${slugify(tecnica)}`}>
+            #{slugify(tecnica)}
+          </a>
+        ))}
+      </div>
+    </div>
+  </div>
+</article>
+
+<style>
+  .writeup-cover {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    border-bottom: 1px solid var(--border);
+    color: inherit;
+  }
+
+  .writeup-cover--generated {
+    min-height: 10.5rem;
+    background:
+      radial-gradient(circle at 72% 30%, rgb(61 220 151 / 0.18), transparent 25%),
+      linear-gradient(rgb(61 220 151 / 0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(61 220 151 / 0.045) 1px, transparent 1px),
+      #09100e;
+    background-size: auto, 22px 22px, 22px 22px, auto;
+  }
+
+  .writeup-cover--generated::after {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(120deg, transparent 35%, rgb(61 220 151 / 0.08), transparent 65%);
+    content: '';
+    transform: translateX(-100%);
+    transition: transform 600ms ease;
+  }
+
+  article:hover .writeup-cover--generated::after { transform: translateX(100%); }
+
+  .cover-coordinates {
+    position: absolute;
+    z-index: 1;
+    top: 0.65rem;
+    right: 0.75rem;
+    left: 0.75rem;
+    display: flex;
+    justify-content: space-between;
+    color: #668078;
+    font-family: var(--font-mono);
+    font-size: 0.52rem;
+    letter-spacing: 0.08em;
+  }
+
+  svg { position: absolute; inset: 1.6rem 0 0; width: 100%; height: 7rem; color: #3ddc97; }
+  .cover-lines { stroke: currentColor; stroke-width: 1; stroke-dasharray: 3 5; opacity: 0.32; }
+  .cover-nodes { fill: currentColor; filter: drop-shadow(0 0 5px #3ddc97); }
+
+  .cover-title {
+    position: absolute;
+    z-index: 1;
+    right: 0.8rem;
+    bottom: 0.7rem;
+    left: 0.8rem;
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1rem;
+    font-family: var(--font-mono);
+  }
+
+  .cover-title span { color: #91a59b; font-size: 0.6rem; text-transform: uppercase; }
+  .cover-title strong { color: #dce8e1; font-size: 0.78rem; text-align: right; }
+</style>
